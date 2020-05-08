@@ -1,5 +1,5 @@
 # Begins with tensorflow python3 and GPU
-FROM tensorflow/tensorflow:nightly-gpu-py3
+FROM tensorflow/tensorflow:latest-gpu-py3
 
 # Copy all files into the container
 COPY ./ ./
