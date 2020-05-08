@@ -1,4 +1,5 @@
 import os
+import re
 import numpy as np
 import pandas as pd
 
@@ -29,7 +30,6 @@ def build_dense_net(input_shape, output_shape, hidden_neurons, n_activations=["t
     
     return model
 
-
 def getGradientWeights(y_train, mode='standard'):
         if y_train.ndim > 1:
             y_train = y_train.argmax(axis=1)
@@ -40,15 +40,81 @@ def getGradientWeights(y_train, mode='standard'):
         return {cls_index: float(min_class) / cls_count
                 for cls_index, cls_count in zip(cls_indices, event_count)}
 
+def checkFileIntegrity(path, n_sorts):
+    def extract_sort_number(files, preffix, suffix):
+        return map(
+            lambda x: int(x[0]),
+            filter(
+                lambda x: x is not None, 
+                map(
+                    lambda x: re.search('(?<=%s)[0-9]+(?=%s)' % (preffix, suffix),  x), 
+                    files
+                )
+            )
+        )
 
-def train_fold(data, trgt, i, train, test, f_mode, model_path, n_classes, train_params):
+    def check_sort_count(sort_numbers):
+        for i in range(len(sort_numbers)):
+            if i != sort_numbers[i]:
+                return False
+        return True
+
+    train_files = os.listdir(path)
+    if len(train_files) == 0:
+        return -1
+
+    history_nrs = list(extract_sort_number(train_files, 'history_', ''))
+    weights_data_nrs = list(extract_sort_number(train_files, 'weights_', '[.]data'))
+    weights_index_nrs = list(extract_sort_number(train_files, 'weights_', '[.]index'))
+
+    history_nrs.sort()
+    weights_data_nrs.sort()
+    weights_index_nrs.sort()
+
+    isCorrupted = (
+        (not check_sort_count(history_nrs)) or 
+        (not check_sort_count(weights_data_nrs)) or 
+        (not check_sort_count(weights_index_nrs))
+    )
+    if isCorrupted:
+        print('Corrupted training. Missing files for old init')
+        return -1 # purge folder and start over signal
+
+    isSameLength = len(history_nrs) == len(weights_data_nrs) == len(weights_index_nrs)
+    if not isSameLength:
+        print('Mismatch between weights and history file counting')
+        return -1 # purge folder and start over signal
+
+    # Job interrupted error
+    if not (history_nrs[-1] == n_sorts - 1):
+        print('Training incomplete')
+        return -1 # purge folder and start over signal
+
+    # Checking for best weights and prediction files existence
+    if not os.path.exists(os.path.join(path, 'weights.index')):
+        print('Missing best weights file')
+        return -1 # purge folder and start over signal
+    if not os.path.exists(os.path.join(path, 'predictions.csv')):
+        print('Missing predictions file')
+        return -1 # purge folder and start over signal
+
+    return 0 # finished job
+    
+    
+def train_fold(data, trgt, i, train, test, f_mode, model_path, n_classes, model_params, train_params):
     np.random.shuffle(train)
 
     # Create paths
     if os.path.exists(model_path):
-        if os.path.exists(os.path.join(model_path, 'predictions.csv')):
+        code = checkFileIntegrity(model_path, train_params['n_inits'])
+        if code == -1:
+            print('Purging folder content and restarting fold training')
+            for file in os.listdir(model_path): 
+                os.remove(os.path.join(model_path, file)) 
+        else:
             print('Already trained')
             return
+
     else:
         os.makedirs(model_path)
 
@@ -90,12 +156,12 @@ def train_fold(data, trgt, i, train, test, f_mode, model_path, n_classes, train_
                          save_weights_only=True)
 
     # Run n sorts for model
-    hidden_neurons = [6]
+    hidden_neurons = model_params['hidden_neurons']
     for ik in range(train_params['n_inits']):
         run_sort(X_train, y_train, 
                  X_val, y_val,
-                 cls_weights, ik, mc, n_classes, hidden_neurons, model_path,
-                 train_params)
+                 cls_weights, ik, mc, n_classes, model_path,
+                 model_params, train_params)
         
     # Generate model test data
     model = build_dense_net((X_train.shape[1],), n_classes, hidden_neurons)
@@ -107,11 +173,12 @@ def train_fold(data, trgt, i, train, test, f_mode, model_path, n_classes, train_
 def run_sort(X_train, y_train, 
              X_val, y_val,
              cls_weights, ik, 
-             mc, n_classes, hidden_neurons, model_path, train_params):    
+             mc, n_classes, model_path, model_params, train_params):    
 
+    hidden_neurons = model_params['hidden_neurons']
     model = build_dense_net((X_train.shape[1],), n_classes, hidden_neurons)
     
-    # Checkpoint for sort documentation 
+    # Checkpoint for init documentation 
     mc2 = ModelCheckpoint(save_best_only=True, 
                     filepath=os.path.join(model_path, 'weights_%i' % ik),
                     save_weights_only=True)

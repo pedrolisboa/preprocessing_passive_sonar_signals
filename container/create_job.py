@@ -22,6 +22,7 @@ def run_jobs(configFile, dataFile, outputPath):
     database = params['database']
     signal_proc_params = params['signal_proc_params']
     spectrogram_args = params['spectrogram_args']
+    model_params = params['model_params']
     training_params = params['training_params']
     preprocessing_config = params['preprocessing_config']
 
@@ -48,9 +49,8 @@ def run_jobs(configFile, dataFile, outputPath):
     cvo = skf.split(data, trgt)
     for i, (train, test) in enumerate(cvo):
         K.clear_session()
-        model_path = os.path.join(outputPath, 
-        '%s-%s-%s-%s' % (p_mode, t_mode, e_mode, f_mode), '%i_fold' % i)
-        train_fold(data, trgt, i, train, test, f_mode, model_path, n_classes, training_params)
+        model_path = os.path.join(outputPath, '%i_fold' % i)
+        train_fold(data, trgt, i, train, test, f_mode, model_path, n_classes, model_params, training_params)
 
 if __name__ == "__main__":    
     # Arg parser
