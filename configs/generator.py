@@ -1,13 +1,20 @@
 import json
 import os
+import argparse
 from itertools import product
 from src.preprocessing_blocks import (frequency_decimation_blocks, 
                                   background_noise_correction_blocks, 
                                   individual_spectrum_normalization_blocks,
                                   frequency_bin_normalization_blocks)
 
-# Creating grid map from defined modes
 
+parser = argparse.ArgumentParser()
+parser.add_argument('-p', '--path', action='store', dest='path',
+                    required=False, default='.', 
+                    help='Base path to store config folders. Defaults to current')
+args = parser.parse_args()                
+
+# Creating grid map from defined modes
 base_config = {
     "database": "4classes",
     "signal_proc_params": {
@@ -57,7 +64,7 @@ for (p_mode, t_mode, e_mode, f_mode) in mode_combinations:
     }
     base_config['preprocessing_config'] = preprocessing_config
 
-    config_folder = os.path.join('user.plisboa.acoustic_lane.%s' % database)
+    config_folder = os.path.join(args.path ,'user.plisboa.acoustic_lane.%s' % database)
     config_name = 'user.plisboa.%s_p_%s_t_%s_e_%s_f_%s_neurons_%i.json' % (
         database, 
         p_mode, t_mode, e_mode, f_mode,
