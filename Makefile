@@ -22,6 +22,7 @@ build-container:
 dataset:
 	docker run \
 		-it \
+		--env-file "${PROJECT_DIR}"/.env \
 		-v "${PROJECT_DIR}"/data:/data \
 		-v "${PROJECT_DIR}"/scripts:/scripts:ro \
 		-u ${USER_ID}:${USER_GROUP} \
@@ -32,6 +33,7 @@ dataset:
 config:
 	docker run \
 		-it \
+		--env-file "${PROJECT_DIR}"/.env \
 		-v "${PROJECT_DIR}"/configs:/configs\
 		-v "${PROJECT_DIR}"/scripts:/scripts:ro \
 		-u ${USER_ID}:${USER_GROUP} \
@@ -43,6 +45,7 @@ config:
 ###################################
 sync:
 	scripts/sync_datasets.sh
+	scripts/sync_containers.sh
 	scripts/sync_configs.sh
 	scripts/sync_tasks.sh
 
@@ -52,6 +55,7 @@ run: sync
 run-local:
 	docker run \
 		-it \
+		--env-file "${PROJECT_DIR}"/.env \
 		-v "${PROJECT_DIR}"/data:/data:ro \
 		-v "${PROJECT_DIR}"/configs:/configs:ro\
 		-v "${PROJECT_DIR}"/models:/models \

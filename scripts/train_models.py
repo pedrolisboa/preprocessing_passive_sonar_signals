@@ -52,17 +52,15 @@ if not args.useCluster:
     for filename in mode_combinations:
         filepath = os.path.abspath(os.path.join(config_folder, filename))
         modelpath = os.path.join(models_dir, filename.replace('.json', ''))
-        # process = Popen("python3 %s -c %s -o %s -d %s" % (jobfile, filepath, modelpath, datapath), shell=True).wait()
         create_job.run_jobs(filepath, datapath, modelpath)
-        # print(process)
 else:
     import lps_maestro as maestro
 
-    username = 'plisboa'
-    taskname = 'user.plisboa.acoustic_lane.4classes.preprocessing_passive_sonar'
-    dataset = 'user.plisboa.4classes_acoustic_lane_fs_22050_b_8_pos_45m.hdf5'
-    configs = 'user.plisboa.acoustic_lane.4classes.preprocessing_passive_sonar.config'
-    container = 'pedrolisboa/theseus'
+    username = os.environ['CLUSTER_USER']
+    taskname = 'user.%s.acoustic_lane.4classes.preprocessing_passive_sonar' % username
+    dataset = 'user.%s.4classes_acoustic_lane_fs_22050_b_8_pos_45m.hdf5' % username
+    configs = 'user.%s.acoustic_lane.4classes.preprocessing_passive_sonar.config' % username
+    container = '%s/theseus' % os.environ['DOCKERHUB']
 
 
     execCommand = 'python3 /create_job.py -c %IN -o %OUT -d %DATA'
