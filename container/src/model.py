@@ -120,7 +120,7 @@ def run_sort(X_train, y_train,
     history = model.fit(X_train, y_train,
                         epochs=train_params['epochs'], batch_size=train_params['batch_size'], 
                         class_weight=cls_weights,
-                        callbacks=[mc, es, mc2], verbose=0, 
+                        callbacks=[mc, es, mc2], verbose=1, 
                         shuffle=True, validation_data=(X_val, y_val))
                         
     pd.DataFrame(history.history).to_csv(os.path.join(model_path, 'history_%i.csv' % ik))
