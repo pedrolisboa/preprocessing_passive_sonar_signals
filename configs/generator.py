@@ -64,8 +64,9 @@ for (p_mode, t_mode, e_mode, f_mode) in mode_combinations:
     }
     base_config['preprocessing_config'] = preprocessing_config
 
-    config_folder = os.path.join(args.path ,'user.plisboa.acoustic_lane.%s' % database)
-    config_name = 'user.plisboa.%s_p_%s_t_%s_e_%s_f_%s_neurons_%i.json' % (
+    config_folder = os.path.join(args.path ,'user.%s.acoustic_lane.%s' % (os.environ['CLUSTER_USER'], database))
+    config_name = 'user.%s.%s_p_%s_t_%s_e_%s_f_%s_neurons_%i.json' % (
+        os.environ['CLUSTER_USER'],
         database, 
         p_mode, t_mode, e_mode, f_mode,
         hidden_neurons)
