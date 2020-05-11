@@ -2,18 +2,16 @@ import json
 import os
 import argparse
 from itertools import product
-from src.preprocessing_blocks import (frequency_decimation_blocks, 
-                                  background_noise_correction_blocks, 
-                                  individual_spectrum_normalization_blocks,
-                                  frequency_bin_normalization_blocks)
-
+from src.preprocessing_blocks import (frequency_decimation_blocks,
+                                      background_noise_correction_blocks,
+                                      individual_spectrum_normalization_blocks,
+                                      frequency_bin_normalization_blocks)
 
 parser = argparse.ArgumentParser()
 parser.add_argument('-p', '--path', action='store', dest='path',
-                    required=False, default='.', 
+                    required=False, default='.',
                     help='Base path to store config folders. Defaults to current')
-args = parser.parse_args()                
-
+args = parser.parse_args()
 # Creating grid map from defined modes
 base_config = {
     "database": "4classes",
@@ -64,8 +62,8 @@ for (p_mode, t_mode, e_mode, f_mode) in mode_combinations:
     }
     base_config['preprocessing_config'] = preprocessing_config
 
-    config_folder = os.path.join(args.path ,'user.%s.acoustic_lane.%s' % (os.environ['CLUSTER_USER'], database))
-    config_name = 'user.%s.%s_p_%s_t_%s_e_%s_f_%s_neurons_%i.json' % (
+    config_folder = os.path.join(args.path ,'user.%s.raw.%s.preprocessing_grid_search' % (os.environ['CLUSTER_USER'], database))
+    config_name = 'user.%s.raw.%s.p_%s.t_%s.e_%s.f_%s.neurons_%i.json' % (
         os.environ['CLUSTER_USER'],
         database, 
         p_mode, t_mode, e_mode, f_mode,

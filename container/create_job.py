@@ -1,19 +1,15 @@
 import os
-import pandas as pd
-import numpy as np
 import json
+import argparse
+
+import numpy as np
 
 from sklearn.model_selection import StratifiedKFold
-import tensorflow.keras.backend as K
-
-from poseidon.io.offline import load_raw_data, SonarDict
-
-from itertools import product
-
+from poseidon.io.offline import SonarDict
 from src.feature_extraction import preprocess_data, generate_data_trgt_pair
-
 from src.model import train_fold
-import argparse
+
+import tensorflow.keras.backend as K
 
 def run_jobs(configFile, dataFile, outputPath):
     # Load experiment configuration
@@ -27,21 +23,19 @@ def run_jobs(configFile, dataFile, outputPath):
     preprocessing_config = params['preprocessing_config']
 
     p_mode = preprocessing_config['p_mode']
-    t_mode = preprocessing_config['t_mode'] 
-    e_mode = preprocessing_config['e_mode'] 
+    t_mode = preprocessing_config['t_mode']
+    e_mode = preprocessing_config['e_mode']
     f_mode = preprocessing_config['f_mode']
 
     # Loading data
     raw_data = SonarDict.from_hdf5(dataFile)
 
     # Raw data feature extraction and processing
-    data, trgt = generate_data_trgt_pair(
-            preprocess_data(
-                raw_data, 
+    data, trgt = generate_data_trgt_pair(preprocess_data(
+                raw_data,
                 p_mode, t_mode, e_mode,
                 signal_proc_params, spectrogram_args
-            )
-        )
+                ))
     n_classes = np.unique(trgt).shape[0]
 
 
@@ -50,9 +44,12 @@ def run_jobs(configFile, dataFile, outputPath):
     for i, (train, test) in enumerate(cvo):
         K.clear_session()
         model_path = os.path.join(outputPath, '%i_fold' % i)
-        train_fold(data, trgt, i, train, test, f_mode, model_path, n_classes, model_params, training_params)
+        train_fold(
+            data, trgt, i, train, test, f_mode, model_path,
+            n_classes, model_params, training_params
+        )
 
-if __name__ == "__main__":    
+if __name__ == "__main__":
     # Arg parser
     parser = argparse.ArgumentParser()
     parser.add_argument('-c','--configFile', action='store',

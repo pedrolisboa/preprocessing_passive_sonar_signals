@@ -8,7 +8,7 @@ In order to start running the experiments on this repository, place the acoustic
 <repository_path>/data/raw/4classes
 ```
 
-Create a .env file inside the cloned repository with the following enviroment variables set to the dockerhub and cluster username. Even if the models are going to be trained locally, the cluster username
+Create a .env file inside the cloned repository with the following environment variables set to the dockerhub and cluster username. Even if the models are going to be trained locally, the cluster username
 will be used to name the configuration and results folders.
 
 ``` bash
@@ -40,10 +40,10 @@ make config
 make dataset
 ```
 
-### Upload the configuration folder and datset to the lps cluster (not implemented yet, follow the maestro documentation)
+### Generate tasks metadata files, informing dataset and configuration files to be used
 
 ``` bash
-make sync
+make task
 ```
 
 ### Running experiments

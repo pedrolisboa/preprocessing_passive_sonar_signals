@@ -7,5 +7,3 @@ cd ../
 
 docker build -t pedrolisboa/theseus:$1 ./container
 docker build -t pedrolisboa/theseus:latest ./container
-docker push pedrolisboa/theseus:$1
-docker push pedrolisboa/theseus:latest

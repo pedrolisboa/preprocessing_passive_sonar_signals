@@ -12,5 +12,5 @@ setup(
     version="0.1",
     packages=find_packages(),
     description="passive sonar preprocessing for classification experiments",
-    install_reqs = parse_requirements(os.path.join('container', 'requirements.txt'))
+    install_reqs=parse_requirements(os.path.join('container', 'requirements.txt'))
 )
