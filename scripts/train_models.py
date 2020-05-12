@@ -55,7 +55,7 @@ if not args.useCluster:
 
     for filename in mode_combinations:
         filepath = os.path.abspath(os.path.join(config_folder, filename))
-        modelpath = os.path.join(tasks_dir, config_folder, filename.replace('.json', ''))
+        modelpath = os.path.join(tasks_dir, config_folder.split('/')[-1], filename.replace('.json', ''))
         create_job.run_jobs(filepath, datapath, modelpath)
 else:
     import lps_maestro as maestro
