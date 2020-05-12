@@ -1,5 +1,6 @@
 import os
 import re
+import shutil
 import numpy as np
 import pandas as pd
 
@@ -110,8 +111,12 @@ def train_fold(data, trgt, i, train, test, f_mode, model_path, n_classes, model_
         if code == -1:
             print('Purging folder content and restarting fold training')
             for file in os.listdir(model_path): 
-                os.remove(os.path.join(model_path, file)) 
-        else:
+                fpath = os.path.join(model_path, file)
+                if os.path.isfile(fpath):
+                    os.remove(fpath) 
+                else:
+                    shutil.rmtree(fpath) 
+            else:
             print('Already trained')
             return
 
