@@ -35,9 +35,10 @@ args = parser.parse_args()
 
 base_dir = os.getcwd()
 configs_dir = os.path.join(base_dir, 'configs')
-configs_folder_content = list(filter(lambda x: x not in ['generator.py'], os.listdir('configs')[0]))
+configs_folder_content = list(filter(lambda x: x not in ['generator.py'], os.listdir('configs')))[0]
 tasks_dir = 'tasks'
 meta_dir = os.path.join(base_dir, 'metadata')
+username = os.environ['CLUSTER_USER']
 
 # TODO change offline interface to match maestro interface (wrapper around for loop)
 if not args.useCluster:
@@ -48,8 +49,9 @@ if not args.useCluster:
     mode_combinations = os.listdir(config_folder)
 
     dataset='4classes'
-    datapath = os.path.join('data', 'raw', dataset,
-                           '%s_acoustic_lane_fs_22050_b_8_pos_45m.hdf5' % dataset)
+    datapath = os.path.join(
+        'data', 'raw', 
+        dataset, 'user.%s.dataset.raw.%s.acoustic.lane.fs_22050.b_8.pos_45m.hdf5' % (username, dataset))
 
     for filename in mode_combinations:
         filepath = os.path.abspath(os.path.join(config_folder, filename))
@@ -58,7 +60,6 @@ if not args.useCluster:
 else:
     import lps_maestro as maestro
 
-    username = os.environ['CLUSTER_USER']
     container = '%s/theseus' % os.environ['DOCKERHUB']
     for metafile in os.listdir(meta_dir):
         # taskname = 'user.%s.acoustic_lane.4classes.preprocessing_passive_sonar' % username

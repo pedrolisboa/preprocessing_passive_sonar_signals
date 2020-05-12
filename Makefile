@@ -52,7 +52,7 @@ task:
 		pedrolisboa/theseus:latest \
 		${PYTHON_INTERPRETER} scripts/build_tasks.py --path configs
 
-run: 
+run: build-container sync
 	${PYTHON_INTERPRETER} scripts/train_models.py --useCluster True
 
 run-local:
@@ -61,9 +61,12 @@ run-local:
 		--env-file "${PROJECT_DIR}"/.env \
 		-v "${PROJECT_DIR}"/data:/data:ro \
 		-v "${PROJECT_DIR}"/configs:/configs:ro\
-		-v "${PROJECT_DIR}"/models:/models \
+		-v "${PROJECT_DIR}"/tasks:/tasks \
 		-v "${PROJECT_DIR}"/scripts:/scripts:ro \
 		-u ${USER_ID}:${USER_GROUP} \
 		pedrolisboa/theseus:latest \
 		${PYTHON_INTERPRETER} scripts/train_models.py --useCluster False --jobfileFolder .		
 
+sync:
+	scripts/sync_containers.sh
+	scripts/sync_tasks.sh
