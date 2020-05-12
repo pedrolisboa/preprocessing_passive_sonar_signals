@@ -62,7 +62,7 @@ for (p_mode, t_mode, e_mode, f_mode) in mode_combinations:
     }
     base_config['preprocessing_config'] = preprocessing_config
 
-    config_folder = os.path.join(args.path ,'user.%s.raw.%s.preprocessing_grid_search' % (os.environ['CLUSTER_USER'], database))
+    config_folder = os.path.join(args.path ,'user.%s.raw.%s.preprocessing_grid_search_run6' % (os.environ['CLUSTER_USER'], database))
     config_name = 'user.%s.raw.%s.p_%s.t_%s.e_%s.f_%s.neurons_%i.json' % (
         os.environ['CLUSTER_USER'],
         database, 

@@ -38,12 +38,11 @@ def run_jobs(configFile, dataFile, outputPath):
                 ))
     n_classes = np.unique(trgt).shape[0]
 
-
     skf = StratifiedKFold(n_splits=training_params['n_splits'], shuffle=True, random_state=42)
     cvo = skf.split(data, trgt)
     for i, (train, test) in enumerate(cvo):
         K.clear_session()
-        model_path = os.path.join(outputPath, '%i_fold' % i)
+        model_path = os.path.join(outputPath, configFile.split('/')[-1], '%i_fold' % i)
         train_fold(
             data, trgt, i, train, test, f_mode, model_path,
             n_classes, model_params, training_params

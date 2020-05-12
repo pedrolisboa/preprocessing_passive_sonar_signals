@@ -60,3 +60,11 @@ To execute the tasks locally, run the following
 ``` bash
 make run-local
 ```
+
+### Downloading results from the cluster (use only after receiving notification of task completion)
+
+This command will download finished tasks from the cluster. Only tasks listed in metadata folder will be downloaded.
+
+``` bash
+make sync-tasks
+```
